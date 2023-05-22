@@ -1,0 +1,40 @@
+Hearing Notice generation query:
+
+SELECT Id, ADM_Alcohol_Test_Type__c, Type, CreatedDate, Needs_New_Hearing_Letter__c, CaseNumber, Needs_Hearing_Letter_Regeneration__c, RecordType.DeveloperName, CATER_Case_Number__c, ADM_Respondent_Name__c, Respondent_Address__c, ADM_Respondent_Street__c, ADM_Respondent_City__c, ADM_Respondent_State__c, ADM_Respondent_ZipCode__c, ADM_Suspension_Effective__c, ADM_Arrest_Date__c, ADM_DMV_Location__c, ADM_Test_Refusal_Impairment__c, ADM_CDL__c, ADM_Drug_Test_Type__c, Hearing_Notice_Generated_Date__c, ADM_CMV__c, ADM_Hazmat__c, ADM_Refused_Failed__c, Is_BAC_Over_Legal_Limit__c, (SELECT Id, Status__c, CreatedDate, needs_new_letter_hearing__c, Full_Name__c, State__c, Street__c, Additional_Street__c, Street_Address__c, Zip__c, City__c, City_State_Zip__c FROM AKA__r WHERE Status__c = 'Active'), (SELECT Id, Status__c, Hearing_Date__c, Start_Time__c, Respondent_Letter_Date__c, Needs_New_Letter_Hearing__c FROM Hearings__r WHERE Needs_New_Letter_Hearing__c=true) FROM Case WHERE (Needs_New_Hearing_Letter__c = true OR Needs_Hearing_Letter_Regeneration__c = true) AND (ADM_Refused_Failed__c != 'F' OR Is_BAC_Over_Legal_Limit__c != 'No') AND RecordType.DeveloperName='Per_Se' Order By CreatedDate
+
+Suspension Notice generation query:
+
+SELECT Id, CaseNumber, CATER_Case_Number__c, Type, ADM_Respondent_Street__c, ADM_Respondent_City__c, ADM_Respondent_State__c, ADM_Respondent_ZipCode__c, CreatedDate, ADM_Respondent_DOB__c, ADM_License_State__c, ADM_DLNumber__c, ADM_Respondent_Name__c, Respondent_Address__c, ADM_CDL__c, ADM_CMV__c, ADM_Fatal__c, ADM_Prior_227a__c, ADM_Refused_Failed__c, ADM_Test_Refusal_Impairment__c, ADM_Observation__c, ADM_Prescribed_Pediatric_Extended_Care__c, ADM_Arrest_Date__c, ADM_IID_Duration__c, ADM_Suspension_Effective__c, ADM_Respond_By_Date__c, ADM_Disqual_Period__c, ADM_Drug_Recognition_Expert__c, Suspension_Notice_Generation_Date__c, Suspension_Notice_Generation_Prior_Date__c, (SELECT Id, Status__c, Full_Name__c, Street_Address__c, Street__c, Additional_Street__c, City__c, State__c, Zip__c, City_State_Zip__c FROM AKA__r WHERE Status__c = 'Active'), (SELECT Id, Firm__c, Contact__r.salutation, Contact__r.FirstName, Contact__r.Suffix, Contact__r.LastName, Contact__r.MiddleName, Contact__r.MailingStreet, Contact__r.MailingCity, Contact__r.MailingState, Contact__r.MailingPostalCode, ADM_Needs_new_Affirmation_Letter__c FROM Attorneys__r) FROM Case WHERE ADM_Mail_To_Date__c = TODAY AND RecordType.DeveloperName='Per_Se' Order By CreatedDate
+
+Affirmation Notice generation query:
+
+SELECT Id, Type, CaseNumber, CATER_Case_Number__c, ADM_Respondent_Name__c, Respondent_Address__c, ADM_Respondent_Street__c, ADM_Respondent_City__c, ADM_Respondent_State__c, ADM_Respondent_ZipCode__c, Needs_New_Affirmation_Notice__c, ADM_Suspension_Effective__c, ADM_IID_Duration__c, (SELECT Id, Needs_New_Affirmation_Notice__c, Full_Name__c, Street_Address__c, City_State_Zip__c FROM AKA__r WHERE Needs_New_Affirmation_Notice__c = TRUE AND Status__c='Active'), (SELECT Id, Firm__c, Contact__r.salutation, Contact__r.FirstName, Contact__r.Suffix, Contact__r.LastName, Contact__r.MiddleName, Contact__r.MailingStreet, Contact__r.MailingCity, Contact__r.MailingState, Contact__r.MailingPostalCode, ADM_Needs_new_Affirmation_Letter__c FROM Attorneys__r WHERE ADM_Needs_new_Affirmation_Letter__c = TRUE) FROM Case WHERE Status = 'Open-No Hearing Scheduled' AND Needs_New_Affirmation_Notice__c = TRUE AND ADM_Respond_By_Date__c<=LAST_N_DAYS:5 AND RecordType.DeveloperName='Per_Se' Order By CreatedDate
+
+Decision Letter generation query:
+
+SELECT id, Case__c, Case__r.Type, Case__r.CATER_Case_Number__c, Case__r.CaseNumber, Status__c, Hearing_Date__c, Hearing_Location_Name__c, Reporter__c, Findings__c, SubFindings__c, Non_CDL_Decision__c, CDL_Decision__c, IID_Duration__c, Decision_Date__c, Hearing_Officer__c, Hearing_Officer__r.Name, Needs_New_Decision_Letter__c, ADM_Hearing_Location__c, ADM_Hearing_Location__r.Room__c, (SELECT Id, Firm__c, Contact__r.Suffix, Contact__r.FirstName, Contact__r.LastName, Contact__r.MiddleName, Contact__r.MailingStreet, Contact__r.MailingCity, Contact__r.MailingState, Contact__r.MailingPostalCode, Needs_New_Decision_Letter__c FROM Hearing_Account_Associations__r WHERE Needs_New_Decision_Letter__c=true), (SELECT id, Police_Officer__r.Title__c, Police_Officer__r.Suffix__c, Police_Officer__r.Police_Name__c, Police_Officer__r.Police_Street_Address__c, Police_Officer__r.Police_City__c, Police_Officer__r.Police_State__c, Police_Officer__r.Police_ZipCode__c, Needs_New_Decision_Letter__c, Police_Officer__r.Police_Department__r.State_Police__c, Police_Officer__r.Police_Department__r.Name FROM ADM_Hearing_Police_Associations__r WHERE Needs_New_Decision_Letter__c=true) FROM ADM_Hearings__c WHERE Status__c='Hearing Held' AND Needs_New_Decision_Letter__c=true Order By LastModifiedDate DESC
+
+Unprocessable letter generation query:
+
+SELECT Id, ADM_SFCase_Created_Date__c, ADM_Case_Creation_Date_Text__c, CaseNumber, ADM_Respondent_Name__c, ADM_Respondent_First_Name__c, ADM_Respondent_Middle_Name__c, ADM_Respondent_Last_Name__c, ADM_Suffix__c, Police_Case__c, Reason__c, Description, Police_Department__c, Police_Department__r.Name, Police_Department__r.Street__c,            Police_Department__r.Additional_Street__c, Police_Department__r.City__c, Police_Department__r.State__c, Police_Department__r.Zip__c FROM Case WHERE Status = 'Unprocessable' AND RecordType.DeveloperName = 'Per_Se_Unprocessable' AND ADM_Case_Creation_Date_Text__c = :INPUT_DATE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
